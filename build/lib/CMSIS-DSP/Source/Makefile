@@ -7305,6 +7305,30 @@ MatrixFunctions/arm_mat_add_f32.c.s:
 	cd /d C:\Users\pedro\Documents\UNICAMP\embarcados\ekf_cross_plat\build && $(MAKE) $(MAKESILENT) -f lib\CMSIS-DSP\Source\CMakeFiles\CMSISDSP.dir\build.make lib/CMSIS-DSP/Source/CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_f32.c.s
 .PHONY : MatrixFunctions/arm_mat_add_f32.c.s
 
+MatrixFunctions/arm_mat_add_f64.obj: MatrixFunctions/arm_mat_add_f64.c.obj
+.PHONY : MatrixFunctions/arm_mat_add_f64.obj
+
+# target to build an object file
+MatrixFunctions/arm_mat_add_f64.c.obj:
+	cd /d C:\Users\pedro\Documents\UNICAMP\embarcados\ekf_cross_plat\build && $(MAKE) $(MAKESILENT) -f lib\CMSIS-DSP\Source\CMakeFiles\CMSISDSP.dir\build.make lib/CMSIS-DSP/Source/CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_f64.c.obj
+.PHONY : MatrixFunctions/arm_mat_add_f64.c.obj
+
+MatrixFunctions/arm_mat_add_f64.i: MatrixFunctions/arm_mat_add_f64.c.i
+.PHONY : MatrixFunctions/arm_mat_add_f64.i
+
+# target to preprocess a source file
+MatrixFunctions/arm_mat_add_f64.c.i:
+	cd /d C:\Users\pedro\Documents\UNICAMP\embarcados\ekf_cross_plat\build && $(MAKE) $(MAKESILENT) -f lib\CMSIS-DSP\Source\CMakeFiles\CMSISDSP.dir\build.make lib/CMSIS-DSP/Source/CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_f64.c.i
+.PHONY : MatrixFunctions/arm_mat_add_f64.c.i
+
+MatrixFunctions/arm_mat_add_f64.s: MatrixFunctions/arm_mat_add_f64.c.s
+.PHONY : MatrixFunctions/arm_mat_add_f64.s
+
+# target to generate assembly for a file
+MatrixFunctions/arm_mat_add_f64.c.s:
+	cd /d C:\Users\pedro\Documents\UNICAMP\embarcados\ekf_cross_plat\build && $(MAKE) $(MAKESILENT) -f lib\CMSIS-DSP\Source\CMakeFiles\CMSISDSP.dir\build.make lib/CMSIS-DSP/Source/CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_f64.c.s
+.PHONY : MatrixFunctions/arm_mat_add_f64.c.s
+
 MatrixFunctions/arm_mat_add_q15.obj: MatrixFunctions/arm_mat_add_q15.c.obj
 .PHONY : MatrixFunctions/arm_mat_add_q15.obj
 
@@ -15963,6 +15987,9 @@ help:
 	@echo ... MatrixFunctions/arm_mat_add_f32.obj
 	@echo ... MatrixFunctions/arm_mat_add_f32.i
 	@echo ... MatrixFunctions/arm_mat_add_f32.s
+	@echo ... MatrixFunctions/arm_mat_add_f64.obj
+	@echo ... MatrixFunctions/arm_mat_add_f64.i
+	@echo ... MatrixFunctions/arm_mat_add_f64.s
 	@echo ... MatrixFunctions/arm_mat_add_q15.obj
 	@echo ... MatrixFunctions/arm_mat_add_q15.i
 	@echo ... MatrixFunctions/arm_mat_add_q15.s

@@ -597,6 +597,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_f16.c.obj.d"
   "CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_f32.c.obj"
   "CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_f32.c.obj.d"
+  "CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_f64.c.obj"
+  "CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_f64.c.obj.d"
   "CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_q15.c.obj"
   "CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_q15.c.obj.d"
   "CMakeFiles/CMSISDSP.dir/MatrixFunctions/arm_mat_add_q31.c.obj"

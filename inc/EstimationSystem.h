@@ -23,22 +23,22 @@ typedef union SYSTEM_STATE{
     float32_t fStateVector[8];
 }SystemState;
 
-extern float32_t fStateVector[8];
-extern  float32_t fX_hat_priori[NUM_STATES];
-extern float32_t fP_priori[NUM_STATES][NUM_STATES];
-extern float32_t fP_posteriori[NUM_STATES][NUM_STATES];
-extern float32_t fF_jacobian[NUM_STATES][NUM_STATES];
-extern float32_t fH_jacobian[2][NUM_STATES];
-extern float32_t fH_nonlinear[2];
-extern float32_t fK[NUM_STATES][2];
+extern float64_t fStateVector[8];
+extern  float64_t fX_hat_priori[NUM_STATES];
+extern float64_t fP_priori[NUM_STATES][NUM_STATES];
+extern float64_t fP_posteriori[NUM_STATES][NUM_STATES];
+extern float64_t fF_jacobian[NUM_STATES][NUM_STATES];
+extern float64_t fH_jacobian[2][NUM_STATES];
+extern float64_t fH_nonlinear[2];
+extern float64_t fK[NUM_STATES][2];
 
 
 // extern float32_t fHPH_t[2][2];            // H * P_priori * H'
 
 // void vEstimationSystemInit(SystemState* pSysState, TelemetryData* pTelemData, MotorCommands* pMotorCommands);
-extern void vEstimationSystemComputeEstimate(float32_t u1, float32_t u2, float32_t z1, float32_t z2);
+extern void vEstimationSystemComputeEstimate(float64_t u1, float64_t u2, float64_t z1, float64_t z2);
 extern void vEstimationSystemComputeObservation(void);
 extern void vEstimationSYstemCalculateK(void);
-extern void vEstimationSystemCalculateXposteriori(float32_t z1, float32_t z2);
+extern void vEstimationSystemCalculateXposteriori(float64_t z1, float64_t z2);
 extern void vEstimationSystemCalculatePposteriori();
 #endif
