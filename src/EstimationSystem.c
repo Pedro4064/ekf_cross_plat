@@ -1,5 +1,6 @@
 #include "EstimationSystem.h"
 
+#define GLOBAL_TEST 1
 
 float64_t fStateVector[8];
 
@@ -138,10 +139,10 @@ void vEstimationSystemComputeObservation(void){
     float64_t t2 = cosf(x[6]); // x(7) in MATLAB, zero-based index 6 in C
     float64_t t3 = sinf(x[6]);
 
-    fH_jacobian[0][4] = t2; // Corresponds to t2
-    fH_jacobian[1][4] = t3; // Corresponds to t3
-    fH_jacobian[1][2] = -t3 * x[2] + t2 * x[5]; // -t3 * x(3) + t2 * x(6) in MATLAB
-    fH_jacobian[1][6] = 1.0f; // Corresponds to 1.0
+    fH_jacobian[0][2] = t2; // Corresponds to t2
+    fH_jacobian[0][5] = t3; // Corresponds to t3
+    fH_jacobian[0][6] = -t3 * x[2] + t2 * x[5]; // -t3 * x(3) + t2 * x(6) in MATLAB
+    fH_jacobian[1][7] = 1.0f; // Corresponds to 1.0
 
     // Computes the nonlinear observation matrix h
     fH_nonlinear[0] = x[2] * cosf(x[6]) + x[5] * sinf(x[6]); // x(3)*cos(x(7)) + x(6)*sin(x(7))
@@ -153,6 +154,19 @@ void vEstimationSystemComputeObservation(void){
 
 void vEstimationSystemEkfPredict(void){
 
+    #if GLOBAL_TEST == 0
+    static char cFirstIteration = 1;
+    if(cFirstIteration){
+        // Initialize all matrices used in the extended kalman filter implementation
+        arm_mat_init_f64(&mP_posteriori, NUM_STATES, NUM_STATES, &fP_posteriori[0][0]);
+        arm_mat_init_f64(&mP_priori, NUM_STATES, NUM_STATES, &fP_priori[0][0]);
+        arm_mat_init_f64(&mQ, NUM_STATES, NUM_STATES, &fQ[0][0]);
+        arm_mat_init_f64(&mF_jacobian, NUM_STATES, NUM_STATES, &fF_jacobian[0][0]);
+
+        cFirstIteration = 0;
+        return;
+    }
+    #endif
 
     float64_t fF_trans[NUM_STATES][NUM_STATES]; // Transpose of F
     float64_t fF_P[NUM_STATES][NUM_STATES];     // Intermediate result F * P_posteriori
@@ -190,6 +204,7 @@ void vEstimationSYstemCalculateK(void){
     arm_matrix_instance_f64 mHPH_t_R_inv;
     arm_matrix_instance_f64 mK_temp;
 
+    #if GLOBAL_TEST == 0
     static char cFirstIteration = 1;
 
     if(cFirstIteration){
@@ -198,10 +213,13 @@ void vEstimationSYstemCalculateK(void){
         arm_mat_init_f64(&mR, 2, 2, &fR[0][0]);
         arm_mat_init_f64(&mK, NUM_STATES, 2, &fK[0][0]);
         arm_mat_init_f64(&mH_jacobian, 2, NUM_STATES, &fH_jacobian[0][0]);
+        arm_mat_init_f64(&mX_hat_priori, NUM_STATES, 1, &fX_hat_priori[0]);   // INPUT
 
         cFirstIteration = 0;
-        return;
     }
+    #endif
+
+    vEstimationSystemComputeObservation();
 
     arm_mat_init_f64(&mH_trans, NUM_STATES, 2, (float64_t *)fH_trans);
     arm_mat_init_f64(&mHPH_t_R, 2, 2, (float64_t *)fHPH_t_R);
@@ -331,65 +349,30 @@ void vEstimationSystemCalculatePposteriori(){
 
 void vEstimationSystemEkfEstimate(float64_t z1, float64_t z2){
 
-     static char cFirstIteration = 1;
+    #if GLOBAL_TEST == 0
+        static char cFirstIteration = 1;
 
-    if(cFirstIteration){
-        // Initialize all matrices used in the extended kalman filter implementation
-        arm_mat_init_f64(&mZ, 2, 1, &fZ[0][0]);
-        arm_mat_init_f64(&mU, 2, 1, &fU[0][0]);
-        arm_mat_init_f64(&mX_hat_posteriori, NUM_STATES, 1, &(fStateVector[0]));
-        arm_mat_init_f64(&mX_hat_priori, NUM_STATES, 1, &fX_hat_priori[0]);
-        arm_mat_init_f64(&mP_posteriori, NUM_STATES, NUM_STATES, &fP_posteriori[0][0]);
-        arm_mat_init_f64(&mP_priori, NUM_STATES, NUM_STATES, &fP_priori[0][0]);
-        arm_mat_init_f64(&mQ, NUM_STATES, NUM_STATES, &fQ[0][0]);
-        arm_mat_init_f64(&mR, 2, 2, &fR[0][0]);
-        arm_mat_init_f64(&mK, NUM_STATES, 2, &fK[0][0]);
-        arm_mat_init_f64(&mF_jacobian, NUM_STATES, NUM_STATES, &fF_jacobian[0][0]);
-        arm_mat_init_f64(&mH_jacobian, 2, NUM_STATES, &fH_jacobian[0][0]);
-        arm_mat_init_f64(&mH_nonlinear, 2, 1, &fH_nonlinear[0]);
+        if(cFirstIteration){
+            // Initialize all matrices used in the extended kalman filter implementation
+            arm_mat_init_f64(&mZ, 2, 1, &fZ[0][0]);
+            arm_mat_init_f64(&mU, 2, 1, &fU[0][0]);
+            arm_mat_init_f64(&mX_hat_posteriori, NUM_STATES, 1, &(fStateVector[0]));
+            arm_mat_init_f64(&mX_hat_priori, NUM_STATES, 1, &fX_hat_priori[0]);
+            arm_mat_init_f64(&mP_posteriori, NUM_STATES, NUM_STATES, &fP_posteriori[0][0]);
+            arm_mat_init_f64(&mP_priori, NUM_STATES, NUM_STATES, &fP_priori[0][0]);
+            arm_mat_init_f64(&mQ, NUM_STATES, NUM_STATES, &fQ[0][0]);
+            arm_mat_init_f64(&mR, 2, 2, &fR[0][0]);
+            arm_mat_init_f64(&mK, NUM_STATES, 2, &fK[0][0]);
+            arm_mat_init_f64(&mF_jacobian, NUM_STATES, NUM_STATES, &fF_jacobian[0][0]);
+            arm_mat_init_f64(&mH_jacobian, 2, NUM_STATES, &fH_jacobian[0][0]);
+            arm_mat_init_f64(&mH_nonlinear, 2, 1, &fH_nonlinear[0]);
 
-        cFirstIteration = 0;
-        return;
-    }
+            cFirstIteration = 0;
+            // return;
+        }
+    #endif
 
-    float64_t fH_trans[NUM_STATES][2];  // Transpose of H
-    float64_t fHPH_t[2][2];            // H * P_priori * H'
-    float64_t fHPH_t_R[2][2];          // H * P_priori * H' + R
-    float64_t fHPH_t_R_inv[2][2];      // Inverse of H * P_priori * H' + R
-    float64_t fK_temp[NUM_STATES][2];  // K intermediate
-
-    arm_matrix_instance_f64 mH_trans;
-    arm_matrix_instance_f64 mHPH_t;
-    arm_matrix_instance_f64 mHPH_t_R;
-    arm_matrix_instance_f64 mHPH_t_R_inv;
-    arm_matrix_instance_f64 mK_temp;
-
-    arm_mat_init_f64(&mH_trans, NUM_STATES, 2, (float64_t *)fH_trans);
-    arm_mat_init_f64(&mHPH_t, 2, 2, (float64_t *)fHPH_t);
-    arm_mat_init_f64(&mHPH_t_R, 2, 2, (float64_t *)fHPH_t_R);
-    arm_mat_init_f64(&mHPH_t_R_inv, 2, 2, (float64_t *)fHPH_t_R_inv);
-    arm_mat_init_f64(&mK_temp, NUM_STATES, 2, (float64_t *)fK_temp);
-
-    // Calculate K gain //////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
-    // H' (Transpose of H_jacobian)
-    arm_mat_trans_f64(&mH_jacobian, &mH_trans);
-
-    // H * P_priori * H'
-    arm_mat_mult_f64(&mH_jacobian, &mP_priori, &mHPH_t);
-    arm_mat_mult_f64(&mHPH_t, &mH_trans, &mHPH_t);
-
-    // H * P_priori * H' + R
-    arm_mat_add_f64(&mHPH_t, &mR, &mHPH_t_R);
-
-    // Inverse of H * P_priori * H' + R
-    arm_mat_inverse_f64(&mHPH_t_R, &mHPH_t_R_inv);
-
-    // P_priori * H'
-    arm_mat_mult_f64(&mP_priori, &mH_trans, &mK_temp);
-
-    // K = P_priori * H' * inv(H * P_priori * H' + R)
-    arm_mat_mult_f64(&mK_temp, &mHPH_t_R_inv, &mK);
+    vEstimationSYstemCalculateK();
 
     // Calculate X hat posteriori /////////////////////////////////////
     //////////////////////////////////////////////////////////////////
@@ -493,4 +476,31 @@ void vEstimationSystemComputeEstimate(float64_t u1, float64_t u2, float64_t z1, 
 
     vEstimationSystemComputeDynamicModel(u1, u2);
     vEstimationSystemEkfPredict();
+}
+
+
+
+void EstimationStep(float64_t z1, float64_t z2){
+
+    static char cFirstIteration = 1;
+    if(cFirstIteration){
+            arm_mat_init_f64(&mX_hat_priori, NUM_STATES, 1, &fX_hat_priori[0]);   // INPUT
+            arm_mat_init_f64(&mP_priori, NUM_STATES, NUM_STATES, &fP_priori[0][0]); // INPUT
+
+            arm_mat_init_f64(&mP_posteriori, NUM_STATES, NUM_STATES, &fP_posteriori[0][0]); // OUTPUT
+            arm_mat_init_f64(&mX_hat_posteriori, NUM_STATES, 1, &(fStateVector[0]));
+
+            arm_mat_init_f64(&mR, 2, 2, &fR[0][0]); // GLOBAL
+            arm_mat_init_f64(&mK, NUM_STATES, 2, &fK[0][0]); // GLOBAL
+            arm_mat_init_f64(&mF_jacobian, NUM_STATES, NUM_STATES, &fF_jacobian[0][0]); // GLOBAL
+            arm_mat_init_f64(&mH_jacobian, 2, NUM_STATES, &fH_jacobian[0][0]); // GLOBAL
+            arm_mat_init_f64(&mH_nonlinear, 2, 1, &fH_nonlinear[0]); // GLOBAL
+
+            cFirstIteration = 0;
+    }
+
+    vEstimationSystemComputeObservation();
+    vEstimationSystemEkfEstimate(z1, z2);
+ 
+
 }

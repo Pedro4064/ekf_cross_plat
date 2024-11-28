@@ -41,4 +41,10 @@ extern void vEstimationSystemComputeObservation(void);
 extern void vEstimationSYstemCalculateK(void);
 extern void vEstimationSystemCalculateXposteriori(float64_t z1, float64_t z2);
 extern void vEstimationSystemCalculatePposteriori();
+
+extern void vEstimationSystemComputeDynamicModel(float64_t u1, float64_t u2);
+extern void vEstimationSystemEkfPredict(void);
+
+extern void EstimationStep(float64_t z1, float64_t z2);
+
 #endif
