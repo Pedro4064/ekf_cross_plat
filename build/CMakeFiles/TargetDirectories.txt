@@ -1,0 +1,6 @@
+C:/Users/pedro/Documents/UNICAMP/embarcados/ekf_cross_plat/build/CMakeFiles/ARM_Math_Project.dir
+C:/Users/pedro/Documents/UNICAMP/embarcados/ekf_cross_plat/build/CMakeFiles/edit_cache.dir
+C:/Users/pedro/Documents/UNICAMP/embarcados/ekf_cross_plat/build/CMakeFiles/rebuild_cache.dir
+C:/Users/pedro/Documents/UNICAMP/embarcados/ekf_cross_plat/build/lib/CMSIS-DSP/Source/CMakeFiles/CMSISDSP.dir
+C:/Users/pedro/Documents/UNICAMP/embarcados/ekf_cross_plat/build/lib/CMSIS-DSP/Source/CMakeFiles/edit_cache.dir
+C:/Users/pedro/Documents/UNICAMP/embarcados/ekf_cross_plat/build/lib/CMSIS-DSP/Source/CMakeFiles/rebuild_cache.dir
