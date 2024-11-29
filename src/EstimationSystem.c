@@ -40,6 +40,7 @@ float64_t fR[2][2] = {
                                 {0.0f, 10.00f}
                             };
 
+float64_t fF_P[NUM_STATES][NUM_STATES];     // Intermediate result F * P_posteriori
 
 
 
@@ -58,6 +59,7 @@ static arm_matrix_instance_f64 mQ;
 static arm_matrix_instance_f64 mR;
 
 
+static arm_matrix_instance_f64 mF_P;
 
 // void vEstimationSystemInit(SystemState* pSysState, TelemetryData* pTelemData, MotorCommands* pMotorCommands){
 //     // Save necessary system variables
@@ -104,7 +106,7 @@ void vEstimationSystemComputeDynamicModel(float64_t u1, float64_t u2){
     fX_hat_priori[7] = (r / L) * (u[1] - u[0]);
 
 
-    // Compute transition matrix jacobian
+    // // Compute transition matrix jacobian
     float64_t *x = fStateVector;
 
     fF_jacobian[0][0] = 1.0f;
@@ -125,6 +127,36 @@ void vEstimationSystemComputeDynamicModel(float64_t u1, float64_t u2){
     fF_jacobian[7][7] = 0.0f; // Add other terms as required
 
 
+}
+
+void CalculateFjacobian(float64_t u1, float64_t u2){
+
+    float64_t Ts = 0.1f;
+    float64_t r = 0.035f;
+    float64_t L = 0.1f;
+
+    //    float64_t u[2] = {pMotorCommands->fLeftMotorSpeed, pMotorCommands->fRightMotorSpeed};
+    float64_t u[2] = {u1, u2};
+
+
+    float64_t *x = fStateVector;
+
+    fF_jacobian[0][0] = 1.0f;
+    fF_jacobian[0][1] = Ts;
+    fF_jacobian[0][2] = 0.5f * Ts * Ts;
+
+    fF_jacobian[1][6] = -(r / 2.0f) * sinf(x[6]) * (u[0] + u[1]);
+
+    fF_jacobian[3][3] = 1.0f;
+    fF_jacobian[3][4] = Ts;
+    fF_jacobian[3][5] = 0.5f * Ts * Ts;
+
+    fF_jacobian[4][6] = (r / 2.0f) * cosf(x[6]) * (u[0] + u[1]);
+
+    fF_jacobian[6][6] = 1.0f;
+    fF_jacobian[6][7] = Ts;
+
+    fF_jacobian[7][7] = 0.0f; // Add other terms as required
 }
 
 /**
@@ -169,12 +201,10 @@ void vEstimationSystemEkfPredict(void){
     #endif
 
     float64_t fF_trans[NUM_STATES][NUM_STATES]; // Transpose of F
-    float64_t fF_P[NUM_STATES][NUM_STATES];     // Intermediate result F * P_posteriori
     float64_t fF_P_Ft[NUM_STATES][NUM_STATES];  // Intermediate result F * P_posteriori * F^T
 
-    arm_matrix_instance_f64 mF_trans, mF_P, mF_P_Ft;
+    arm_matrix_instance_f64 mF_trans, mF_P_Ft;
     arm_mat_init_f64(&mF_trans, NUM_STATES, NUM_STATES, &fF_trans[0][0]);
-    arm_mat_init_f64(&mF_P, NUM_STATES, NUM_STATES, &fF_P[0][0]);
     arm_mat_init_f64(&mF_P_Ft, NUM_STATES, NUM_STATES, &fF_P_Ft[0][0]);
 
     // Compute F * P_posteriori
@@ -502,5 +532,31 @@ void EstimationStep(float64_t z1, float64_t z2){
     vEstimationSystemComputeObservation();
     vEstimationSystemEkfEstimate(z1, z2);
  
+
+}
+
+
+void PredictionStep(float64_t u1, float64_t u2){
+
+    static char cFirstIteration = 1;
+    if(cFirstIteration){
+        // Initialize all matrices used in the extended kalman filter implementation
+
+            arm_mat_init_f64(&mX_hat_posteriori, NUM_STATES, 1, &(fStateVector[0])); // INPUT
+            arm_mat_init_f64(&mP_posteriori, NUM_STATES, NUM_STATES, &fP_posteriori[0][0]); // INPUT
+
+            arm_mat_init_f64(&mX_hat_priori, NUM_STATES, 1, &fX_hat_priori[0]); // OUTPUT
+            arm_mat_init_f64(&mP_priori, NUM_STATES, NUM_STATES, &fP_priori[0][0]); // OUTPUT
+            arm_mat_init_f64(&mF_jacobian, NUM_STATES, NUM_STATES, &fF_jacobian[0][0]); // OUTPUT
+
+            arm_mat_init_f64(&mQ, NUM_STATES, NUM_STATES, &fQ[0][0]); // GLOBAL
+
+            arm_mat_init_f64(&mF_P, NUM_STATES, NUM_STATES, &fF_P[0][0]);
+
+        cFirstIteration = 0;
+    }
+    
+    vEstimationSystemComputeDynamicModel(u1, u2);
+    vEstimationSystemEkfPredict();
 
 }

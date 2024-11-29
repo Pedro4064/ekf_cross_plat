@@ -31,7 +31,7 @@ extern float64_t fF_jacobian[NUM_STATES][NUM_STATES];
 extern float64_t fH_jacobian[2][NUM_STATES];
 extern float64_t fH_nonlinear[2];
 extern float64_t fK[NUM_STATES][2];
-
+extern float64_t fF_P[NUM_STATES][NUM_STATES];     // Intermediate result F * P_posteriori
 
 // extern float32_t fHPH_t[2][2];            // H * P_priori * H'
 
@@ -45,6 +45,7 @@ extern void vEstimationSystemCalculatePposteriori();
 extern void vEstimationSystemComputeDynamicModel(float64_t u1, float64_t u2);
 extern void vEstimationSystemEkfPredict(void);
 
+extern void CalculateFjacobian(float64_t u1, float64_t u2);
 extern void EstimationStep(float64_t z1, float64_t z2);
-
+extern void PredictionStep(float64_t u1, float64_t u2);
 #endif
